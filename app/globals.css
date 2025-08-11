@@ -1,4 +1,12 @@
 @import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #1a1a1a;
+  color: #C1FFF2;
+}
 
 :root {
   --background: #ffffff;
@@ -24,3 +32,101 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@layer utilities {
+  .perspective {
+    perspective: 1000px;
+  }
+  .transform-style {
+    transform-style: preserve-3d;
+  }
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+  .rotate-y-180 {
+    transform: rotateY(180deg);
+  }
+}
+ul li {
+  position: relative;
+  list-style: none;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  transition: 0.5s;
+  overflow: hidden;
+}
+ul li::before,
+ul li::after {
+  content: "";
+  position: absolute;
+  border-radius: 60px;
+  z-index: -1;
+}
+
+/* HOLOGRAPHIC GRADIENT OVERLAY */
+/* HOLOGRAPHIC EFFECT — REFLECTIVE CARD */
+.holographic-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  overflow: hidden;
+  z-index: 1;
+  transition: transform 0.4s ease;
+  isolation: isolate;
+}
+
+.holographic-card:hover {
+  transform: scale(1.02);
+}
+
+.holographic-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    130deg,
+    rgba(128, 255, 114, 0.3),
+    rgba(126, 232, 250, 0.2),
+    rgba(255, 255, 255, 0.1)
+  );
+  background-size: 400% 400%;
+  animation: shimmer 6s linear infinite;
+  mix-blend-mode: screen;
+  z-index: -1;
+  pointer-events: none;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+html {
+  scroll-behavior: smooth;
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradientMove 3s ease infinite;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
