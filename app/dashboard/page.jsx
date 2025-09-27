@@ -1,15 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function DashboardHome() {
   const [graphType, setGraphType] = useState("Daily");
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch('/api/session', { credentials: 'include' });
+        if (!res.ok) return;
+        const data = await res.json();
+        setUser(data.user || null);
+      } catch (e) {
+        // ignore
+      }
+    })();
+  }, []);
 
   return (
     <div className="bg-[#1B2A26] p-6 rounded-xl flex-1 shadow-lg border border-gray-800">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-xl font-bold text-white">Progress Overview</h3>
+        {user && <div className="text-sm text-gray-300">Welcome, {user.name}</div>}
         <div className="flex gap-2">
           {["Daily", "Weekly", "Monthly"].map((type) => (
             <button

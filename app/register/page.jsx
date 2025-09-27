@@ -5,6 +5,7 @@ import { useState } from "react";
 
 export default function RegisterPage() {
   const router = useRouter();
+
   const [formData, setFormData] = useState({
     name: "",
     age: "",
@@ -19,14 +20,67 @@ export default function RegisterPage() {
     pushups: "",
   });
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    localStorage.setItem("fitnessUser", JSON.stringify(formData));
-    router.push("/dashboard");
+    setLoading(true);
+    setError("");
+    try {
+      // Prepare suggestedPlans (placeholder)
+      const suggestedPlans = [];
+
+      const response = await fetch("/api/register", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          // no Firebase UID — backend will create a local uid
+          name: formData.name,
+          email: formData.email,
+          age: parseInt(formData.age) || null,
+          weight: parseFloat(formData.weight) || null,
+          height: parseFloat(formData.height) || null,
+          gender: formData.gender,
+          activity: formData.activity,
+          mainGoal: formData.mainGoal,
+          dietType: formData.dietType,
+          pushups: parseInt(formData.pushups) || 0,
+          suggestedPlans,
+        }),
+      });
+
+      if (response.status === 409) {
+        setError("Email already in use");
+        return;
+      }
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to register");
+      }
+
+      // Success: store user in localStorage and redirect to dashboard for that email
+      const resData = await response.json();
+      try {
+        const user = { email: formData.email, uid: resData.uid };
+        // basic client-side session
+        localStorage.setItem("fitness_user", JSON.stringify(user));
+      } catch (e) {
+        // ignore storage errors
+      }
+      router.push(`/dashboard?email=${encodeURIComponent(formData.email)}`);
+    } catch (err) {
+      console.error("Registration error:", err);
+      setError(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -38,6 +92,10 @@ export default function RegisterPage() {
         <h1 className="text-4xl font-extrabold text-center text-[#80FF72] tracking-wide">
           Fitness Registration
         </h1>
+
+        {error && (
+          <p className="text-red-400 text-center font-semibold">{error}</p>
+        )}
 
         {/* Name & Age */}
         <div className="flex gap-4">
@@ -128,11 +186,11 @@ export default function RegisterPage() {
           required
         >
           <option value="">Activity Level</option>
-          <option value="sedentary">Sedentary (little/no exercise)</option>
-          <option value="light">Lightly active (1-3 days/week)</option>
-          <option value="moderate">Moderately active (3-5 days/week)</option>
-          <option value="very">Very active (6-7 days/week)</option>
-          <option value="extra">Super active (twice/day heavy exercise)</option>
+          <option value="sedentary">Sedentary</option>
+          <option value="light">Lightly active</option>
+          <option value="moderate">Moderately active</option>
+          <option value="very">Very active</option>
+          <option value="extra">Super active</option>
         </select>
 
         {/* Main Goal */}
@@ -176,9 +234,10 @@ export default function RegisterPage() {
         {/* Submit Button */}
         <button
           type="submit"
+          disabled={loading}
           className="w-full py-3 rounded-lg font-bold text-black bg-gradient-to-r from-[#80FF72] to-[#7EE8FA] hover:from-[#7EE8FA] hover:to-[#80FF72] transition-all duration-300 transform hover:scale-105"
         >
-          🚀 Register Now
+          {loading ? "Registering..." : "🚀 Register Now"}
         </button>
       </form>
     </main>

@@ -1,0 +1,24 @@
+{
+  "breakfast": [
+    {"id":"b1","name":"Oats Upma","type":"Vegetarian","timeOfDay":"breakfast","goal":"both","calories":320,"protein_g":12,"carbs_g":48,"fats_g":6,"tags":["low-oil","high-fiber"],"recipeUrl":""},
+    {"id":"b2","name":"Paneer Bhurji + 1 Roti","type":"Vegetarian","timeOfDay":"breakfast","goal":"gain","calories":450,"protein_g":25,"carbs_g":40,"fats_g":18,"tags":["high-protein"],"recipeUrl":""},
+    {"id":"b3","name":"Boiled Eggs + Wholegrain Toast","type":"Non-Veg","timeOfDay":"breakfast","goal":"both","calories":360,"protein_g":28,"carbs_g":30,"fats_g":12,"tags":["low-oil","high-protein"],"recipeUrl":""}
+  ],
+  "snack": [
+    {"id":"s1","name":"Sprouts Salad","type":"Vegetarian","timeOfDay":"snack","goal":"both","calories":140,"protein_g":8,"carbs_g":20,"fats_g":3,"tags":["light","low-oil"],"recipeUrl":""},
+    {"id":"s2","name":"Fruit Bowl + 8 Almonds","type":"Vegetarian","timeOfDay":"snack","goal":"gain","calories":210,"protein_g":6,"carbs_g":30,"fats_g":9,"tags":["light"],"recipeUrl":""},
+    {"id":"s3","name":"Boiled Egg (1)","type":"Non-Veg","timeOfDay":"snack","goal":"both","calories":80,"protein_g":6,"carbs_g":1,"fats_g":6,"tags":["light","post-workout"],"recipeUrl":""}
+  ],
+  "lunch": [
+    {"id":"l1","name":"Dal + 2 Rotis + Veg Sabzi","type":"Vegetarian","timeOfDay":"lunch","goal":"both","calories":520,"protein_g":20,"carbs_g":70,"fats_g":12,"tags":["balanced"],"recipeUrl":""},
+    {"id":"l2","name":"Grilled Chicken + 2 Rotis + Salad","type":"Non-Veg","timeOfDay":"lunch","goal":"both","calories":600,"protein_g":45,"carbs_g":50,"fats_g":18,"tags":["high-protein","low-oil"],"recipeUrl":""}
+  ],
+  "eveningSnack": [
+    {"id":"e1","name":"Protein Shake + Banana","type":"Both","timeOfDay":"eveningSnack","goal":"gain","calories":260,"protein_g":25,"carbs_g":30,"fats_g":4,"tags":["post-workout"],"recipeUrl":""},
+    {"id":"e2","name":"Green Tea + Handful Walnuts","type":"Vegetarian","timeOfDay":"eveningSnack","goal":"loss","calories":130,"protein_g":3,"carbs_g":4,"fats_g":11,"tags":["light"],"recipeUrl":""}
+  ],
+  "dinner": [
+    {"id":"d1","name":"Grilled Paneer + Veggies","type":"Vegetarian","timeOfDay":"dinner","goal":"both","calories":400,"protein_g":28,"carbs_g":30,"fats_g":14,"tags":["low-oil","high-protein"],"recipeUrl":""},
+    {"id":"d2","name":"Moong Dal Soup + 1 Roti","type":"Vegetarian","timeOfDay":"dinner","goal":"loss","calories":310,"protein_g":18,"carbs_g":35,"fats_g":6,"tags":["light","low-calorie"],"recipeUrl":""}
+  ]
+}

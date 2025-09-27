@@ -27,53 +27,20 @@ export default function AssistantUI() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: input }),
       });
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || "Unknown error");
-      }
-      const data = await res.json();
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          text: data.reply || "I’m here, but couldn’t get a proper response just now.",
-        },
-      ]);
-    } catch (err) {
-      console.error("Chat error:", err);
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          text:
-            `⚠ Oops, I couldn’t connect to AI. ${err.message ? "Error: " + err.message : "Let’s try again or you can ask something else."}`,
-        },
-      ]);
-    }
 
-    setLoading(false);
-  };
-
-  // Optional: test API connection
-  const testApi = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/assistant", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: "test" }),
-      });
       const data = await res.json();
+
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", text: `API test: ${JSON.stringify(data)}` },
+        { role: "assistant", text: data.reply || "Sorry, no response." },
       ]);
     } catch (err) {
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", text: "API test failed." },
+        { role: "assistant", text: "Error: Unable to connect to AI." },
       ]);
     }
+
     setLoading(false);
   };
 
@@ -104,7 +71,7 @@ export default function AssistantUI() {
       </div>
 
       {/* Input */}
-      <div className="mt-4 flex gap-2">
+      <div className="mt-4 flex">
         <input
           className="flex-1 p-2 rounded-l-lg bg-[#1f2925] border border-white/20 text-white"
           placeholder="Ask something..."
@@ -118,13 +85,6 @@ export default function AssistantUI() {
           disabled={loading}
         >
           {loading ? "..." : "Send"}
-        </button>
-        <button
-          className="bg-blue-500 text-white px-2 rounded"
-          onClick={testApi}
-          disabled={loading}
-        >
-          Test API
         </button>
       </div>
     </div>
