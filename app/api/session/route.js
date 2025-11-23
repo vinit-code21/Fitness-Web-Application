@@ -1,5 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
+import { NextResponse } from "next/server";
 
 function parseCookies(cookieHeader) {
   if (!cookieHeader) return {};
@@ -15,13 +16,13 @@ export async function GET(req) {
     const cookieHeader = req.headers.get("cookie") || "";
     const cookies = parseCookies(cookieHeader);
     const session = cookies['fitness_session'];
-    if (!session) return new Response(JSON.stringify({ user: null }), { status: 200 });
+    if (!session) return NextResponse.json({ user: null });
 
     let data;
     try {
       data = JSON.parse(decodeURIComponent(session));
     } catch (e) {
-      return new Response(JSON.stringify({ user: null }), { status: 200 });
+      return NextResponse.json({ user: null });
     }
 
     // Lookup full user from file by uid or email
@@ -35,8 +36,8 @@ export async function GET(req) {
     }
 
     const user = users.find(u => u.uid === data.uid || u.email === data.email) || null;
-    return new Response(JSON.stringify({ user }), { status: 200 });
+    return NextResponse.json({ user });
   } catch (err) {
-    return new Response(JSON.stringify({ user: null }), { status: 200 });
+    return NextResponse.json({ user: null });
   }
 }

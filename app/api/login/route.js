@@ -1,29 +1,40 @@
-import fs from "fs/promises";
-import path from "path";
+import { NextResponse } from "next/server";
+import clientPromise from "../../../lib/mongodb";
+import bcrypt from "bcryptjs";
 
 export async function POST(req) {
   try {
-    const { email, uid } = await req.json();
-    const filePath = path.join(process.cwd(), "data", "users.json");
-    let users = [];
-    try {
-      const txt = await fs.readFile(filePath, "utf8");
-      users = JSON.parse(txt || "[]");
-    } catch (err) {
-      users = [];
+    const client = await clientPromise;
+    const db = client.db("FITNESSAPP");
+    const users = db.collection("USERS");
+
+    const { emailOrUid, password } = await req.json();
+
+    if (!emailOrUid || !password) {
+      return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
 
-    const user = users.find((u) => (uid && u.uid === uid) || (email && u.email === email));
+    const user = await users.findOne({
+      $or: [{ email: emailOrUid }, { uid: emailOrUid }],
+    });
+
     if (!user) {
-      return new Response(JSON.stringify({ error: "User not found" }), { status: 404 });
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const cookieValue = encodeURIComponent(JSON.stringify({ email: user.email, uid: user.uid }));
-    const secure = process.env.NODE_ENV === "production";
-    const cookie = `fitness_session=${cookieValue}; Path=/; HttpOnly; SameSite=Lax;${secure ? " Secure;" : ""}`;
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+    }
 
-    return new Response(JSON.stringify(user), { status: 200, headers: { "Set-Cookie": cookie } });
+    const { password: _, ...userData } = user;
+
+    return NextResponse.json({
+      message: "Login successful",
+      user: userData,
+    });
   } catch (error) {
-    return new Response(JSON.stringify({ error: "Failed to fetch user data" }), { status: 500 });
+    console.error("❌ Login API Error:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

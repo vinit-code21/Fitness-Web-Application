@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { NextResponse } from "next/server";
 
 export async function POST(req) {
   try {
@@ -11,13 +12,8 @@ export async function POST(req) {
     const response = await result.response;
     const text = response.text();
 
-    return new Response(JSON.stringify({ reply: text }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    return NextResponse.json({ reply: text });
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-    });
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

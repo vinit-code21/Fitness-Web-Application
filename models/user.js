@@ -1,4 +1,3 @@
-// models/User.js
 import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema(
@@ -14,10 +13,25 @@ const UserSchema = new mongoose.Schema(
     mainGoal: String,
     dietType: String,
     pushups: Number,
-    suggestedPlans: Array, // Store plan IDs or objects
-    progress: Array, // Store user progress updates
+
+    // ✅ Workout Progress
+    completedDays: {
+      type: [String],
+      default: [],
+    },
+
+    // ✅ Calorie progress (date + calories)
+    calorieProgress: {
+      type: [
+        {
+          date: String,
+          calories: Number,
+        },
+      ],
+      default: [],
+    },
   },
   { timestamps: true }
 );
 
-export default mongoose.models.User || mongoose.model("User", UserSchema);
+export default mongoose.models.User || mongoose.model("User", UserSchema, "USERS");

@@ -1,59 +1,83 @@
-// app/api/register/route.js
-import fs from "fs/promises";
-import path from "path";
+import { NextResponse } from "next/server";
+import clientPromise from "../../../lib/mongodb";
+import bcrypt from "bcryptjs";
 
 export async function POST(req) {
-  const body = await req.json();
-
-  const userData = {
-    uid: `local-${Date.now()}`,
-    name: body.name,
-    email: body.email,
-    age: body.age ?? null,
-    weight: body.weight ?? null,
-    height: body.height ?? null,
-    gender: body.gender ?? null,
-    activity: body.activity ?? null,
-    mainGoal: body.mainGoal ?? null,
-    dietType: body.dietType ?? null,
-    pushups: body.pushups ?? 0,
-    suggestedPlans: body.suggestedPlans || [],
-    progress: [],
-    createdAt: new Date().toISOString(),
-  };
-
   try {
-    const dataDir = path.join(process.cwd(), "data");
-    const filePath = path.join(dataDir, "users.json");
-    await fs.mkdir(dataDir, { recursive: true });
+    console.log("🔹 API Hit: /api/register");
 
-    let users = [];
-    try {
-      const txt = await fs.readFile(filePath, "utf8");
-      users = JSON.parse(txt || "[]");
-    } catch (err) {
-      users = [];
+    const client = await clientPromise;
+    const db = client.db("FITNESSAPP");
+    const users = db.collection("USERS");
+
+    const body = await req.json();
+    console.log("🔹 Received Body:", body);
+
+    const {
+      uid,
+      name,
+      email,
+      password,
+      age,
+      weight,
+      height,
+      gender,
+      activity, 
+      mainGoal, 
+      dietType,
+      pushups,
+    } = body;
+
+    if (!uid || !name || !email || !password) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
     }
 
-    // prevent duplicate by email
-    if (users.find((u) => u.email === userData.email)) {
-      return new Response(JSON.stringify({ error: "User already exists" }), { status: 409 });
+    // ✅ Check if user already exists
+    const existing = await users.findOne({ $or: [{ uid }, { email }] });
+    if (existing) {
+      return NextResponse.json(
+        { message: "User already exists" },
+        { status: 200 }
+      );
     }
 
-    users.push(userData);
-    await fs.writeFile(filePath, JSON.stringify(users, null, 2), "utf8");
+    // ✅ Hash password securely
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Set HttpOnly cookie for session
-    const cookieValue = encodeURIComponent(JSON.stringify({ email: userData.email, uid: userData.uid }));
-    const secure = process.env.NODE_ENV === "production";
-    const cookie = `fitness_session=${cookieValue}; Path=/; HttpOnly; SameSite=Lax;${secure ? " Secure;" : ""}`;
+    // ✅ Prepare new user object
+    const newUser = {
+      uid: uid || `FIT${Math.floor(10000 + Math.random() * 90000)}`,
+      name,
+      email,
+      password: hashedPassword,
+      age,
+      weight,
+      height,
+      gender,
+      activityLevel: activity,
+      weightGoal: mainGoal,
+      mainGoal: mainGoal,
+      dietType,
+      pushups,
+      createdAt: new Date(),
+    };
 
-    return new Response(JSON.stringify({ message: "User registered (file)", uid: userData.uid }), {
-      status: 201,
-      headers: { "Set-Cookie": cookie, "Content-Type": "application/json" },
-    });
-  } catch (err) {
-    console.error("Failed to save user to file:", err);
-    return new Response(JSON.stringify({ error: "Failed to save user" }), { status: 500 });
+    // ✅ Insert into MongoDB
+    await users.insertOne(newUser);
+
+    console.log(`✅ New user registered: ${email}`);
+    return NextResponse.json(
+      { success: true, message: "User registered successfully" },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error("❌ API Error:", error);
+    return NextResponse.json(
+      { success: false, error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }

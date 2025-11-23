@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import foodsData from "../../data/foods.json";
 
 export async function POST(req) {
   try {
@@ -6,12 +7,22 @@ export async function POST(req) {
 
     // Check API key
     const calorieKey = process.env.CALORIE_NINJAS_KEY;
-    if (!calorieKey) {
-      console.error("❌ Missing CALORIE_NINJAS_KEY in .env.local");
-      return NextResponse.json(
-        { success: false, error: "Server misconfiguration: API key missing" },
-        { status: 500 }
-      );
+    // If API key is not present, we'll fall back to a local dataset
+    const useLocalFallback = !calorieKey;
+    if (useLocalFallback) {
+      console.warn("⚠️ CALORIE_NINJAS_KEY missing — falling back to local foods.json data");
+      // Build a simple filtered meal list from foodsData
+      const flat = Object.values(foodsData).flat();
+      const filtered = flat.filter((m) => {
+        const g = (goal || "").toLowerCase();
+        const dt = (dietType || "").toLowerCase();
+        let ok = true;
+        if (g && g !== "both") ok = (m.goal || "").toLowerCase().includes(g);
+        if (ok && dt) ok = (m.type || "").toLowerCase().includes(dt) || dt === "any";
+        return ok;
+      });
+
+      return NextResponse.json({ success: true, meals: filtered.slice(0, 9), totalCalories: filtered.reduce((s, m) => s + (m.calories || 0), 0) });
     }
 
     // Build diet query
@@ -54,9 +65,30 @@ export async function POST(req) {
     const dietData = await dietRes.json();
     console.log("✅ API response:", dietData);
 
+    // Enrich external results with local data (images, recipes, youtube links) when possible
+    const flatLocal = Object.values(foodsData).flat();
+    const enriched = (dietData.items || []).map((it) => {
+      // find best local match by name similarity (case-insensitive substring match)
+      const name = (it.name || "").toLowerCase();
+      const match = flatLocal.find((m) => {
+        const localName = (m.name || "").toLowerCase();
+        return localName && (name.includes(localName) || localName.includes(name));
+      });
+      if (match) {
+        return {
+          ...it,
+          image: it.image || match.image,
+          recipe: it.recipe || match.recipe,
+          youtubeUrl: it.youtubeUrl || match.youtubeUrl,
+        };
+      }
+      return it;
+    });
+
     return NextResponse.json({
       success: true,
-      dietPlan: dietData.items || [],
+      meals: enriched,
+      raw: dietData,
     });
 
   } catch (error) {

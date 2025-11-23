@@ -1,3 +1,5 @@
+"use client";
+
 export default function Workouts() {
   const workouts = [
     {
@@ -18,30 +20,34 @@ export default function Workouts() {
   ];
 
   return (
-    <section id="workouts" className="py-16 bg-[#2E3C36] text-center">
-      <h2 className="text-3xl font-bold mb-8 text-celeste">Workout Plans</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-8">
+    <section id="workouts" className="py-20 bg-[#111] text-center relative overflow-x-hidden">
+      <h2 className="text-3xl md:text-4xl font-bold mb-12 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-400 animate-text-fade">
+        Workout Plans
+      </h2>
+
+      <div className="flex flex-wrap justify-center gap-8 px-4 md:px-12">
         {workouts.map((w, i) => (
-          <div key={i} className="perspective">
-            <div className="relative w-full h-[600px] transition-transform duration-700 transform-style preserve-3d hover:rotate-y-180 rounded-xl shadow-xl">
+          <div key={i} className="w-full sm:w-[320px] h-[500px] perspective">
+            <div className="relative w-full h-full transition-transform duration-700 transform-style preserve-3d rounded-2xl shadow-2xl hover:rotate-y-180">
               
-              {/* Front Side (Image with overlay title) */}
-              <div className="absolute inset-0 backface-hidden rounded-xl overflow-hidden">
+              {/* Front Side */}
+              <div className="absolute inset-0 backface-hidden rounded-2xl overflow-hidden">
                 <img
                   src={w.image}
                   alt={w.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                  <h3 className="text-white text-2xl font-bold">{w.title}</h3>
+                  <h3 className="text-white text-2xl md:text-3xl font-bold">{w.title}</h3>
                 </div>
               </div>
 
-              {/* Back Side (Text Info) */}
-              <div className="absolute inset-0 bg-[#1F2925] text-white p-6 backface-hidden rotate-y-180 rounded-xl flex flex-col justify-center items-center">
-                <h3 className="text-xl font-semibold mb-2 text-aquamarine">{w.title}</h3>
-                <p className="text-celeste text-sm">{w.back}</p>
+              {/* Back Side */}
+              <div className="absolute inset-0 bg-white/10 backdrop-blur-lg border border-white/20 text-white p-6 backface-hidden rotate-y-180 rounded-2xl flex flex-col justify-center items-center transition-transform duration-500">
+                <h3 className="text-xl md:text-2xl font-semibold mb-3 text-green-400">{w.title}</h3>
+                <p className="text-sm md:text-base text-cyan-200">{w.back}</p>
               </div>
+
             </div>
           </div>
         ))}

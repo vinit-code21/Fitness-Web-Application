@@ -130,3 +130,51 @@ html {
   animation: fadeIn 0.3s ease-in-out;
 }
 
+html, body, #__next {
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden; /* remove horizontal scroll */
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  overscroll-behavior: none; /* prevent extra scroll bounce */
+}
+:root {
+  --bg-dark: #0a0f0d;
+  --card-dark: #1b2a26;
+  --accent-green: #80FF72;
+  --accent-cyan: #7EE8FA;
+  --text-light: #ffffff;
+  --text-muted: #b3b3b3;
+}
+
+body {
+  background: var(--bg-dark);
+  color: var(--text-light);
+  font-family: 'Inter', sans-serif;
+}
+
+/* Hide native scrollbars but keep scrolling functional
+   - Works on modern browsers (Chrome, Edge, Safari, Firefox)
+   - This keeps internal scrolling available while removing the visible scrollbar UI */
+html, body {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* WebKit browsers */
+html::-webkit-scrollbar, body::-webkit-scrollbar, ::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+  background: transparent;
+}
+
+/* Optional: if you want to hide scrollbar only on body but keep other scrollbars (e.g. for modals),
+   you can instead use a `.hide-scrollbar` utility and add it to a container. */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar { display: none; width: 0; height: 0; }

@@ -1,61 +1,80 @@
-'use client';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [emailOrUid, setEmailOrUid] = useState("");
+  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ emailOrUid, password }),
+      });
 
-    // Retrieve saved user from localStorage
-    const savedUser = JSON.parse(localStorage.getItem('fitnessUser'));
+      const data = await res.json();
+      setMessage(data.message || data.error);
 
-    if (savedUser && savedUser.email === email && savedUser.password === password) {
-      alert(`Welcome back, ${savedUser.name}!`);
-      router.push('/dashboard');
-    } else {
-      alert('Invalid email or password. Please try again.');
+      if (res.ok) {
+        localStorage.setItem("fitnessUser", JSON.stringify(data.user));
+        router.push("/dashboard");
+      }
+    } catch (err) {
+      console.error(err);
+      setMessage("Login failed. Try again.");
     }
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-900 text-white px-4">
+    <main className="min-h-screen flex justify-center items-center bg-[#0a0a0a] relative overflow-hidden px-4">
+      {/* Glowing gradient circles */}
+      <div className="absolute -top-24 -left-24 w-72 h-72 bg-green-400/20 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-cyan-400/20 rounded-full blur-3xl animate-pulse"></div>
+
+      {/* Login Form */}
       <form
         onSubmit={handleLogin}
-        className="bg-black/40 backdrop-blur-md p-8 rounded-2xl shadow-xl w-full max-w-md border border-green-500"
+        className="relative w-full max-w-lg bg-white/10 backdrop-blur-lg p-10 rounded-3xl shadow-2xl border border-white/20 z-10 text-white space-y-6"
       >
-        <h2 className="text-3xl font-bold mb-6 text-center text-green-400">
-          Login to FitnessPro
+        <h2 className="text-4xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-400">
+          Welcome Back 👋
         </h2>
 
-        {/* Email */}
-        <div className="mb-4">
-          <label htmlFor="email" className="block text-sm font-semibold mb-2">
-            Email
+        <p className="text-center text-white/60 mb-4 text-sm">
+          Log in to continue your fitness journey.
+        </p>
+
+        {/* Email / UID */}
+        <div>
+          <label htmlFor="emailOrUid" className="block text-sm font-semibold mb-2">
+            Email or User ID
           </label>
           <input
-            type="email"
-            id="email"
-            className="w-full p-3 rounded-md bg-gray-800 border border-green-400 text-white placeholder-gray-400"
-            placeholder="you@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="text"
+            id="emailOrUid"
+            className="w-full p-4 rounded-xl bg-white/20 border border-white/30 placeholder-white/60 text-white focus:outline-none focus:ring-2 focus:ring-green-400 transition"
+            placeholder="you@example.com or UID"
+            value={emailOrUid}
+            onChange={(e) => setEmailOrUid(e.target.value)}
             required
           />
         </div>
 
         {/* Password */}
-        <div className="mb-6">
+        <div>
           <label htmlFor="password" className="block text-sm font-semibold mb-2">
             Password
           </label>
           <input
             type="password"
             id="password"
-            className="w-full p-3 rounded-md bg-gray-800 border border-green-400 text-white placeholder-gray-400"
+            className="w-full p-4 rounded-xl bg-white/20 border border-white/30 placeholder-white/60 text-white focus:outline-none focus:ring-2 focus:ring-green-400 transition"
             placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -63,22 +82,38 @@ export default function LoginPage() {
           />
         </div>
 
-        {/* Submit */}
+        {/* Button */}
         <button
           type="submit"
-          className="w-full py-3 rounded-lg bg-green-500 hover:bg-green-600 transition-all font-semibold"
+          className="w-full py-4 rounded-xl bg-gradient-to-r from-green-400 to-cyan-400 text-black font-bold text-lg hover:scale-[1.03] shadow-lg transition-all duration-300"
         >
           Login
         </button>
 
-        {/* Link to Register */}
-        <p className="mt-4 text-sm text-center text-gray-400">
-          Don't have an account?{' '}
-          <a href="/register" className="text-green-400 underline">
+        {/* Status Message */}
+        {message && (
+          <p
+            className={`mt-3 text-center text-sm font-medium ${
+              message.includes("successful")
+                ? "text-green-300"
+                : "text-red-300"
+            }`}
+          >
+            {message}
+          </p>
+        )}
+
+        {/* Link */}
+        <p className="text-center text-sm text-white/70 mt-2">
+          Don’t have an account?{" "}
+          <a
+            href="/register"
+            className="text-green-400 hover:text-cyan-400 transition underline"
+          >
             Register
           </a>
         </p>
       </form>
-    </div>
+    </main>
   );
 }

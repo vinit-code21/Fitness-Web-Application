@@ -2,9 +2,7 @@
 
 import { useState } from "react";
 
-export default function IntermediateYoga() {
-  const YT = "https://www.youtube.com/embed/dQw4w9WgXcQ"; // placeholder video
-
+export default function intermediateYoga() {
   const poses = [
     {
       name: "Warrior III (Virabhadrasana III)",
@@ -123,80 +121,87 @@ export default function IntermediateYoga() {
   const [selectedPose, setSelectedPose] = useState(null);
 
   return (
-    <div className="flex-1 bg-[#1B2A26] p-6 rounded-xl shadow-lg border border-gray-800">
-      <h1 className="text-2xl font-bold mb-6 text-white text-center">
-        Intermediate Yoga Poses
-      </h1>
+    <div className="h-[calc(100vh-4rem)] flex flex-col bg-[#0f1815] rounded-xl text-white border border-[#80FF72]/30 shadow-[0_0_30px_rgba(128,255,114,0.25)] overflow-hidden">
+      {/* Header */}
+      <header className="p-5 bg-[#121f19]/80 border-b border-[#80FF72]/30 text-center sticky top-0 z-20 backdrop-blur-lg shadow-[0_0_20px_rgba(128,255,114,0.1)]">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-[#80FF72] to-[#7EE8FA] bg-clip-text text-transparent drop-shadow-[0_0_8px_#80FF72]">
+          Intermediate Yoga Poses
+        </h1>
+        <p className="text-gray-400 text-sm mt-1 tracking-wide">
+          Deepen your practice with challenging sequences 💪
+        </p>
+      </header>
 
-      <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4">
-        {poses.map((pose) => (
-          <div key={pose.name} className="group w-full h-[360px] [perspective:1000px]">
-            <div className="relative w-full h-full transition-transform duration-500 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
-              {/* Front */}
-              <div className="absolute inset-0 rounded-xl overflow-hidden border border-gray-700 shadow-lg [backface-visibility:hidden]">
-                <img src={pose.img} alt={pose.name} className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-black/45 flex items-center justify-center px-3">
-                  <h2 className="text-center text-white font-bold">{pose.name}</h2>
-                </div>
-              </div>
-
-              {/* Back */}
-              <div className="absolute inset-0 bg-[#1B2A26] border border-gray-700 rounded-xl shadow-lg p-4 [transform:rotateY(180deg)] [backface-visibility:hidden] flex flex-col justify-between">
-                <div className="flex-1">
-                  <h3 className="text-[#80FF72] font-semibold mb-2">About this pose</h3>
-                  <p className="text-gray-300 text-sm leading-6">
-                    {pose.detail}
-                  </p>
-
-                  <h4 className="text-[#80FF72] font-semibold mt-3 mb-1">Quick steps</h4>
-                  <div className="relative h-[110px] overflow-hidden">
-                    <ul className="list-disc list-inside text-gray-300 text-sm space-y-1">
-                      {pose.steps.slice(0, 4).map((s, i) => <li key={i}>{s}</li>)}
-                    </ul>
-                    {pose.steps.length > 4 && (
-                      <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-[#1B2A26] to-transparent" />
-                    )}
+      {/* Scrollable Grid */}
+      <div className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-[#80FF72]/40 scrollbar-track-[#0f1815]/20">
+        <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {poses.map((pose) => (
+            <div key={pose.name} className="group h-[340px] [perspective:1000px]">
+              <div className="relative w-full h-full transition-transform duration-500 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
+                {/* Front Card */}
+                <div className="absolute inset-0 rounded-xl overflow-hidden border border-[#80FF72]/30 bg-[#14241c] [backface-visibility:hidden] shadow-[0_0_20px_rgba(128,255,114,0.15)]">
+                  <img
+                    src={pose.img}
+                    alt={pose.name}
+                    className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition"
+                  />
+                  <div className="absolute inset-0 bg-black/45 flex items-center justify-center p-3">
+                    <h2 className="text-center text-white font-semibold text-lg">
+                      {pose.name}
+                    </h2>
                   </div>
                 </div>
 
-                <div className="pt-3">
+                {/* Back Card */}
+                <div className="absolute inset-0 bg-[#142a22]/95 border border-[#80FF72]/30 rounded-xl p-4 [transform:rotateY(180deg)] [backface-visibility:hidden] flex flex-col justify-between">
+                  <div className="flex-1 overflow-hidden">
+                    <h3 className="text-[#80FF72] font-semibold mb-1">About</h3>
+                    <p className="text-gray-300 text-sm mb-2 leading-5">{pose.detail}</p>
+                    <h4 className="text-[#80FF72] font-semibold mb-1">Steps</h4>
+                    <ul className="list-disc list-inside text-gray-300 text-sm space-y-1">
+                      {pose.steps.slice(0, 3).map((s, i) => (
+                        <li key={i}>{s}</li>
+                      ))}
+                    </ul>
+                  </div>
                   <button
                     onClick={() => setSelectedPose(pose)}
-                    className="w-full bg-[#80FF72] text-black font-semibold py-2 px-4 rounded-lg hover:bg-[#6CE464] transition"
+                    className="mt-3 w-full bg-gradient-to-r from-[#80FF72] to-[#7EE8FA] text-black font-semibold py-2 rounded-lg hover:scale-105 transition-transform"
                   >
                     View More
                   </button>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       {/* Modal */}
       {selectedPose && (
-        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-[#243832] border border-gray-700 rounded-xl p-6 w-full max-w-2xl">
+        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
+          <div className="bg-[#1b2a25] border border-[#80FF72]/40 rounded-xl p-6 w-full max-w-2xl shadow-[0_0_25px_rgba(128,255,114,0.25)]">
             <button
               onClick={() => setSelectedPose(null)}
-              className="ml-auto mb-4 block text-white/80 hover:text-white"
-              aria-label="Close"
+              className="ml-auto mb-3 text-white/70 hover:text-white text-xl"
             >
               ✕
             </button>
-            <h2 className="text-2xl font-bold text-[#80FF72] mb-4">{selectedPose.name}</h2>
-            <div className="aspect-video mb-4">
+            <h2 className="text-2xl font-bold text-[#80FF72] mb-3">{selectedPose.name}</h2>
+            <div className="aspect-video mb-4 rounded-lg overflow-hidden">
               <iframe
-                className="w-full h-full rounded-lg"
+                className="w-full h-full"
                 src={selectedPose.video}
                 title={selectedPose.name}
                 frameBorder="0"
                 allowFullScreen
-              />
+              ></iframe>
             </div>
-            <h3 className="text-white font-semibold mb-2">Detailed Steps</h3>
-            <ul className="list-disc list-inside text-gray-200 space-y-1">
-              {selectedPose.steps.map((s, i) => <li key={i}>{s}</li>)}
+            <h3 className="text-lg text-[#80FF72] font-semibold mb-2">Detailed Steps</h3>
+            <ul className="list-disc list-inside text-gray-200 space-y-1 text-sm">
+              {selectedPose.steps.map((s, i) => (
+                <li key={i}>{s}</li>
+              ))}
             </ul>
           </div>
         </div>
